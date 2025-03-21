@@ -44,7 +44,7 @@ export class UsuarioService {
     }
 
     async FiltrarUsuario(id: string) {
-        const idUsuario = await prisma.Usuario().findMany({
+        const idUsuario = await prisma.Usuario().findFirst({
             where: { id },
             select: {
                 id: true,
