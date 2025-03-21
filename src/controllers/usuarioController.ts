@@ -10,11 +10,11 @@ const service = new UsuarioService()
 
 class Usuario {
     async Cadastrar(req: Request, res: Response) {
-        const { nome, sobrenome, email, senha } = req.body
+        const { nome, email, senha, sobrenome } = req.body
 
-        const senhaCriptografada = await hash(senha, 5)
+        const senhaCriptografada = await hash(senha, 10)
 
-        const novoUsuario = await service.Cadastrar(nome, sobrenome, email, senhaCriptografada)
+        const novoUsuario = await service.Cadastrar(nome, email, senhaCriptografada, sobrenome)
 
         res.json(novoUsuario)
     }
@@ -22,6 +22,12 @@ class Usuario {
     async Listar(req: Request, res: Response) {
         const usuarios = await service.ListarUsuarios()
         res.json(usuarios)
+    }
+
+    async Apagar(req: Request, res: Response) {
+        const id = req.params.id
+        const usuarioId = await service.ApagarUsuario(id)
+        res.json(usuarioId)
     }
 }
 
