@@ -43,6 +43,28 @@ export class UsuarioService {
         }
     }
 
+    async FiltrarUsuario(id: string) {
+        const idUsuario = await prisma.Usuario().findMany({
+            where: { id },
+            select: {
+                id: true,
+                nome: true,
+                sobrenome: true,
+                email: true,
+                dtCriacao: true
+            }
+        })
+
+        if(idUsuario) {
+            return idUsuario
+        }
+
+        return {
+            statusCode: 404,
+            msg: 'Não foi encontrado nenhum usuário vinculado ao ID informado.'
+        }
+    }
+
     async ApagarUsuario(id: string) {
         const usuarioId = await prisma.Usuario().findMany({
             where: { id }
