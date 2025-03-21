@@ -24,6 +24,12 @@ class Usuario {
         res.json(usuarios)
     }
 
+    async Filtrar(req: Request, res: Response) {
+        const { id } = req.params
+        const idUsuario = await service.FiltrarUsuario(id)
+        res.json(idUsuario)
+    }
+
     async Apagar(req: Request, res: Response) {
         const id = req.params.id
         const usuarioId = await service.ApagarUsuario(id)
