@@ -9,6 +9,30 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id String @id @default(uuid())
+  nome String
+  sobrenome String?
+  email String @unique
+  senha String
+
+  dtCriacao DateTime @default(now())
+  dtAtualizacao DateTime @updatedAt()
+
+  tarefas Tarefa[]
+}
+
+model Tarefa {
+  id String @id
+  tarefa String @unique
+  usuarioID String
+  usuario Usuario? @relation(fields: [usuarioID], references: [id])
+  
+
+  dtCriacao DateTime @default(now())
+  dtAtualizacao DateTime @updatedAt()
 }
