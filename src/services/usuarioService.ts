@@ -1,18 +1,18 @@
 import { Prisma } from "../config/prisma";
 
-export class UsuarioService {
-    constructor(private prisma: Prisma) {}
+const prisma = new Prisma()
 
+export class UsuarioService {
     async Cadastrar(
         nome: string, email: string,
         senha: string, sobrenome?: string,
     ) {
-        const usuarioExistente = await this.prisma.Usuario().findFirst({
+        const usuarioExistente = await prisma.Usuario().findFirst({
             where: { email }
         })
 
         if(!usuarioExistente) {
-            const novoUsuario = await this.prisma.Usuario().create({
+            const novoUsuario = await prisma.Usuario().create({
                 data: { nome, sobrenome, email, senha}
             })
 
@@ -23,7 +23,7 @@ export class UsuarioService {
     }
 
     async ListarUsuarios() {
-        const usuarios = await this.prisma.Usuario().findMany({
+        const usuarios = await prisma.Usuario().findMany({
             select: {
                 id: true,
                 nome: true,
@@ -37,6 +37,9 @@ export class UsuarioService {
             return usuarios
         }
 
-        return 'Não existe nenhum usuário cadastrado no sistema.'
+        return {
+            statusCode: 404,
+            msg: 'Não existe nenhum usuário cadastrado no sistema.'
+        }
     }
 }
