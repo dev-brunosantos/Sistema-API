@@ -25,7 +25,7 @@ class Usuario {
     }
 
     async Filtrar(req: Request, res: Response) {
-        const { id } = req.params
+        const id = req.params.id
         const idUsuario = await service.FiltrarUsuario(id)
         res.json(idUsuario)
     }
