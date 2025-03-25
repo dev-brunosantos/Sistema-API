@@ -35,6 +35,12 @@ class Usuario {
         const usuarioId = await service.ApagarUsuario(id)
         res.json(usuarioId)
     }
+
+    async Login(req: Request, res: Response) {
+        const { email, senha } = req.body
+        const login = await service.Login(email, senha)
+        res.json(login)
+    }
 }
 
 

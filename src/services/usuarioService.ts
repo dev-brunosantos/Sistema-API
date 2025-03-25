@@ -1,4 +1,10 @@
 import { Prisma } from "../config/prisma";
+import { sign } from 'jsonwebtoken';
+import { compare } from 'bcrypt';
+import dotenv from 'dotenv'
+
+dotenv.config()
+
 
 const prisma = new Prisma()
 
@@ -11,9 +17,9 @@ export class UsuarioService {
             where: { email }
         })
 
-        if(!usuarioExistente) {
+        if (!usuarioExistente) {
             const novoUsuario = await prisma.Usuario().create({
-                data: { nome, email, senha, sobrenome}
+                data: { nome, email, senha, sobrenome }
             })
 
             return `O usuário ${novoUsuario.nome.toUpperCase()} foi cadastrado com sucesso.`
@@ -33,7 +39,7 @@ export class UsuarioService {
             }
         })
 
-        if(usuarios.length > 0) {
+        if (usuarios.length > 0) {
             return usuarios
         }
 
@@ -55,7 +61,7 @@ export class UsuarioService {
             }
         })
 
-        if(idUsuario) {
+        if (idUsuario) {
             return idUsuario
         }
 
@@ -70,9 +76,9 @@ export class UsuarioService {
             where: { id }
         })
 
-        if(usuarioId) {
+        if (usuarioId) {
             await prisma.Usuario().delete({
-                where: {id}
+                where: { id }
             })
 
             return {
@@ -84,6 +90,47 @@ export class UsuarioService {
         return {
             statusCode: 404,
             msg: 'Não foi encontrado nenhum usuário vinculado ao ID informado.'
+        }
+    }
+
+    async Login(email: string, senha: string) {
+        const usuarioExistente = await prisma.Usuario().findFirst({
+            where: { email }
+        })
+
+        if (!usuarioExistente) {
+            return {
+                statusCode: 404,
+                msg: "Usuário não cadastrado no sistema."
+            }
+        }
+
+        const senhaDesctiptografada = await compare(senha, usuarioExistente.senha)
+        if (!senhaDesctiptografada) {
+
+            return {
+                statusCode: 400,
+                msg: "Usuário não possui permissão para acessar essa rota."
+            }
+        }
+
+        const secret = process.env.SECRET
+        if (!secret) {
+            throw new Error('A variável de ambiente SECRET não está definida');
+        }
+
+        const token = await sign(
+            { id: usuarioExistente.id.slice(0, 8) },
+            secret,
+            {
+                subject: usuarioExistente.id.slice(0, 8),
+                expiresIn: '1d'
+            }
+        )
+
+        return {
+            id: usuarioExistente.id.slice(0, 8),
+            token: token
         }
     }
 }
